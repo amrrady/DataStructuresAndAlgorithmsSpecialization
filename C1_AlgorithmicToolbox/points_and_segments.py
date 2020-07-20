@@ -1,40 +1,40 @@
 #!/usr/bin/env python3
 
-def fast_count_segments(starts, ends, points):
-    cnt = [0] * len(points)
-    #write your code here
-    return cnt
+# START = 0
+# POINT = 1
+# END = 2
 
-def is_in_range(ranges, point):
 
-    if len(ranges) and (point < ranges[0][0] or point > ranges[0][1]):
-        return 0
+def isPointInSegment(data):
+    data.sort(key=lambda p: (p[0], int(p[1])))
+    results = {}
+    count = 0
+    for i in data:
+        if i[1] == 0:
+            count += 1
+        elif i[1] == 1:
+            results[i[0]] = count
+        elif i[1] == 2:
+            count -= 1
 
-    within_ranges = 0
-    for i in range(len(ranges)):
-        if ranges[i][0] <= point and point <= ranges[i][1]:
-            within_ranges += 1
-        elif ranges[i][0] > point:
-            break
+    return results
 
-    return within_ranges
 
-def naive_count_segments(ranges, points):
-    cnt = [0] * len(points)
-    for i in range(len(points)):
-        cnt[i] += is_in_range(ranges, points[i])
+def main():
+    n, m = map(int, input().split())
 
-    return cnt
+    data = []
+    for i in range(n):
+        x, y = map(int, input().split())
+        data.append((x, 0))
+        data.append((y, 2))
 
-n, m = map(int,input().split())
+    points = list(map(int, input().split()))
+    for i in points:
+        data.append((i, 1))
 
-ranges = []
-for i in range(0, n):
-    l, r = map(int,input().split())
-    ranges.append((l,r))
+    results = isPointInSegment(data)
 
-ranges = sorted(ranges, key=lambda tup: tup[0])
-print(ranges)
-points = list(map(int,input().split()))
-
-print(*naive_count_segments(ranges, points))
+    print(' '.join(str(results[i]) for i in points))
+if __name__ == "__main__":
+    main()
