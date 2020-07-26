@@ -2,20 +2,32 @@
 import sys
 
 def optimal_sequence(n):
-    sequence = []
-    while n >= 1:
-        sequence.append(n)
-        if n % 3 == 0:
-            n = n // 3
-        elif n % 2 == 0:
-            n = n // 2
-        else:
-            n = n - 1
-    return reversed(sequence)
+    sequence = {0:0, 1:0, 2:1, 3:1}
+    ops = {0:"0", 1:"1", 2:"1 2", 3:"1 3"}
+    for i in range(4, n+1):
+        sequence[i] = sys.maxsize
 
-input = sys.stdin.read()
-n = int(input)
-sequence = list(optimal_sequence(n))
-print(len(sequence) - 1)
-for x in sequence:
-    print(x, end=' ')
+        if i % 3 == 0 and sequence[i/3] + 1 < sequence[i]:
+            sequence[i] = sequence[i/3] + 1
+            ops[i] = "{} {}".format(ops[i / 3], i)
+
+        if i % 2 == 0 and sequence[i/2] + 1 < sequence[i]:
+            sequence[i] = sequence[i/2] + 1
+            ops[i] = "{} {}".format(ops[i / 2], i)
+
+        if sequence[i-1] + 1 < sequence[i]:
+            sequence[i] = sequence[i-1] + 1
+            ops[i] = "{} {}".format(ops[i - 1], i)
+
+
+    return (sequence[n],ops[n])
+
+
+def main():
+    n = int(input())
+    results = optimal_sequence(n)
+    print(results[0])
+    print(results[1])
+
+if __name__ == "__main__":
+    main()
