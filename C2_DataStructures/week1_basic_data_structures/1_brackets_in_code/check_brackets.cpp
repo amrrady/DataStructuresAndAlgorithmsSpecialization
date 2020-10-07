@@ -2,10 +2,13 @@
 #include <stack>
 #include <string>
 
+using std::cout;
+using std::endl;
+
 struct Bracket {
     Bracket(char type, int position):
-        type(type),
-        position(position)
+            type(type),
+            position(position)
     {}
 
     bool Matchc(char c) {
@@ -22,24 +25,45 @@ struct Bracket {
     int position;
 };
 
-int main() {
-    std::string text;
-    getline(std::cin, text);
+bool isOpenBracket(char c){
+    return (c == '(' || c == '[' || c == '{');
+}
 
+bool isCloseBracket(char c){
+    return (c == ')' || c == ']' || c == '}');
+}
+
+std::string checkBalancing(std::string& text){
     std::stack <Bracket> opening_brackets_stack;
-    for (int position = 0; position < text.length(); ++position) {
-        char next = text[position];
 
-        if (next == '(' || next == '[' || next == '{') {
-            // Process opening bracket, write your code here
-        }
+    if(!text.empty()){
+        for (int position = 0; position < text.length(); position++) {
+            char next = text[position];
+            if (isOpenBracket(next)) {
+                if(opening_brackets_stack.empty() || isOpenBracket(opening_brackets_stack.top().type))
+                    opening_brackets_stack.push(Bracket(next, position));
+                else
+                    return std::to_string(position+1);
+            }
 
-        if (next == ')' || next == ']' || next == '}') {
-            // Process closing bracket, write your code here
+            if (isCloseBracket(next)) {
+                if(!opening_brackets_stack.empty() && opening_brackets_stack.top().Matchc(next))
+                        opening_brackets_stack.pop();
+                else
+                    return std::to_string(position+1);
+            }
         }
     }
 
-    // Printing answer, write your code here
+    if(opening_brackets_stack.empty())
+        return "Success";
 
+    return std::to_string(opening_brackets_stack.top().position+1);
+}
+
+int main() {
+    std::string text;
+    getline(std::cin, text);
+    cout << checkBalancing(text) << endl;
     return 0;
 }
