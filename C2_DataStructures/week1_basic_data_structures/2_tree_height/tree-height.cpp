@@ -14,66 +14,75 @@ public:
     std::vector<Node *> children;
 
     Node() {
-      this->parent = NULL;
+        this->parent = NULL;
     }
 
     void setParent(Node *theParent) {
-      parent = theParent;
-      parent->children.push_back(this);
+        parent = theParent;
+        parent->children.push_back(this);
     }
 };
 
 
-int main_with_large_stack_space() {
-  std::ios_base::sync_with_stdio(0);
-  int n;
-  std::cin >> n;
+int treeHeight(Node* root){
+    if(root == NULL)
+        return 0;
 
-  std::vector<Node> nodes;
-  nodes.resize(n);
-  for (int child_index = 0; child_index < n; child_index++) {
-    int parent_index;
-    std::cin >> parent_index;
-    if (parent_index >= 0)
-      nodes[child_index].setParent(&nodes[parent_index]);
-    nodes[child_index].key = child_index;
-  }
+    if(root->children.size() == 0)
+        return 1;
 
-  // Replace this code with a faster implementation
-  int maxHeight = 0;
-  for (int leaf_index = 0; leaf_index < n; leaf_index++) {
     int height = 0;
-    for (Node *v = &nodes[leaf_index]; v != NULL; v = v->parent)
-      height++;
-    maxHeight = std::max(maxHeight, height);
-  }
-    
-  std::cout << maxHeight << std::endl;
-  return 0;
+
+    for(int i = 0; i < root->children.size(); i++)
+        height = std::max(height, treeHeight(root->children[i]));
+
+    return height + 1;
+}
+
+
+int main_with_large_stack_space() {
+    std::ios_base::sync_with_stdio(0);
+    int n = 0;
+    std::cin >> n;
+    std::vector<Node> nodes(n);
+
+    int rootIndex = 0;
+    for (int child_index = 0; child_index < n; child_index++) {
+        int parent_index;
+        std::cin >> parent_index;
+        if (parent_index >= 0)
+            nodes[child_index].setParent(&nodes[parent_index]);
+        else
+            rootIndex = child_index;
+        nodes[child_index].key = child_index;
+    }
+
+    std::cout << treeHeight(&nodes[rootIndex]) << std::endl;
+    return 0;
 }
 
 int main (int argc, char **argv)
 {
 #if defined(__unix__) || defined(__APPLE__)
-  // Allow larger stack space
-  const rlim_t kStackSize = 16 * 1024 * 1024;   // min stack size = 16 MB
-  struct rlimit rl;
-  int result;
+    // Allow larger stack space
+    const rlim_t kStackSize = 16 * 1024 * 1024;   // min stack size = 16 MB
+    struct rlimit rl;
+    int result;
 
-  result = getrlimit(RLIMIT_STACK, &rl);
-  if (result == 0)
-  {
-      if (rl.rlim_cur < kStackSize)
-      {
-          rl.rlim_cur = kStackSize;
-          result = setrlimit(RLIMIT_STACK, &rl);
-          if (result != 0)
-          {
-              std::cerr << "setrlimit returned result = " << result << std::endl;
-          }
-      }
-  }
+    result = getrlimit(RLIMIT_STACK, &rl);
+    if (result == 0)
+    {
+        if (rl.rlim_cur < kStackSize)
+        {
+            rl.rlim_cur = kStackSize;
+            result = setrlimit(RLIMIT_STACK, &rl);
+            if (result != 0)
+            {
+                std::cerr << "setrlimit returned result = " << result << std::endl;
+            }
+        }
+    }
 
 #endif
-  return main_with_large_stack_space();
+    return main_with_large_stack_space();
 }
