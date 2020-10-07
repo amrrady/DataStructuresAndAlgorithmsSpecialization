@@ -1,11 +1,11 @@
 #include <iostream>
-#include <queue>
+#include <deque>
 #include <vector>
 
 struct Request {
     Request(int arrival_time, int process_time):
-        arrival_time(arrival_time),
-        process_time(process_time)
+            arrival_time(arrival_time),
+            process_time(process_time)
     {}
 
     int arrival_time;
@@ -14,8 +14,8 @@ struct Request {
 
 struct Response {
     Response(bool dropped, int start_time):
-        dropped(dropped),
-        start_time(start_time)
+            dropped(dropped),
+            start_time(start_time)
     {}
 
     bool dropped;
@@ -25,16 +25,37 @@ struct Response {
 class Buffer {
 public:
     Buffer(int size):
-        size_(size),
-        finish_time_()
+            size_(size),
+            finish_time_()
     {}
 
     Response Process(const Request &request) {
-        // write your code here
+
+        while(this->finish_time_.size()){
+            if(this->finish_time_.size() && this->finish_time_.front() <= request.arrival_time){
+                this->finish_time_.pop_front();
+            } else {
+                break;
+            }
+        }
+
+        if(this->finish_time_.empty()){
+            Response item = Response(false, request.arrival_time);
+            this->finish_time_.push_back(request.arrival_time + request.process_time);
+            return item;
+        }
+
+        if(this->finish_time_.size() < this->size_){
+            Response item = Response(false, this->finish_time_.back());
+            this->finish_time_.push_back(this->finish_time_.back() + request.process_time);
+            return item;
+        }
+
+        return Response(true, this->finish_time_.back());
     }
 private:
     int size_;
-    std::queue <int> finish_time_;
+    std::deque <int> finish_time_;
 };
 
 std::vector <Request> ReadRequests() {
