@@ -1,32 +1,40 @@
 #include <iostream>
-#include <vector>
+#include <stack>
 #include <string>
 #include <cassert>
-#include <algorithm>
 
 using std::cin;
 using std::string;
-using std::vector;
+using std::stack;
 using std::cout;
-using std::max_element;
 
 class StackWithMax {
-    vector<int> stack;
+    stack<int> _stack;
+    stack<int> _auxiliary_stack;
 
-  public:
+
+public:
 
     void Push(int value) {
-        stack.push_back(value);
+        if(_stack.empty()) {
+            _stack.push(value);
+            _auxiliary_stack.push(value);
+        } else {
+            _stack.push(value);
+            int current_max = value > _auxiliary_stack.top() ? value : _auxiliary_stack.top();
+            _auxiliary_stack.push(current_max);
+        }
     }
 
     void Pop() {
-        assert(stack.size());
-        stack.pop_back();
+        assert(_stack.size());
+        _stack.pop();
+        _auxiliary_stack.pop();
     }
 
     int Max() const {
-        assert(stack.size());
-        return *max_element(stack.begin(), stack.end());
+        assert(_stack.size());
+        return _auxiliary_stack.top();
     }
 };
 
